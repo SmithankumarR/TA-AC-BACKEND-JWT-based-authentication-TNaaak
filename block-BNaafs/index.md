@@ -6,6 +6,6 @@ Extend application from Exercise 2 to add the following:-
 
 - add `/dashboard` route in index router with some random response
 
-- implement middlweares to validate a token when a request is made to protected routes
+- implement middleware to validate a token when a request is made to protected routes
 
 - allow clients to access `/dashboard` only if the user passes the token and token is validated else throw validation errors
