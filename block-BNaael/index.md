@@ -8,7 +8,7 @@ Create an express application where
   - after user logs in, send him JWT token
   - when request comes for protected routes, implement JWT verification
 
-We have 2 routes when we gererate express app i.e.
+We have 2 routes when we generate express app i.e.
 
 - `/` index route
 - `/users` route
