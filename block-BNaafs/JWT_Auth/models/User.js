@@ -1,0 +1,62 @@
+var mongoose = require('mongoose');
+var bcrypt = require('bcrypt');
+var jwt = require('jsonwebtoken');
+
+var Schema = mongoose.Schema;
+
+var userSchema = new Schema(
+  {
+    name: String,
+    email: String,
+    password: String,
+  },
+  {
+    timestamps: true,
+  }
+);
+
+// hash password
+
+userSchema.pre('save', async function (next) {
+  try {
+    this.password = await bcrypt.hash(this.password, 10);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// verify password
+userSchema.methods.verifyPassword = async function (password) {
+  try {
+    let result = await bcrypt.compare(password, this.password);
+    return result;
+  } catch (error) {
+    return error;
+  }
+};
+
+// create a token
+userSchema.methods.createToken = async function () {
+  var payload = { userId: this.name, email: this.email };
+
+  try {
+    console.log(this);
+    var token = jwt.sign(payload, process.env.SECRET);
+    return token;
+  } catch (error) {
+    return error;
+  }
+};
+
+// userJson required data
+userSchema.methods.userJSON = function (token) {
+  return {
+    name: this.name,
+    email: this.email,
+    token: token,
+  };
+};
+
+var User = mongoose.model('User', userSchema);
+module.exports = User;
