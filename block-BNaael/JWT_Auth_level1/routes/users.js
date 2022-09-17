@@ -1,22 +1,22 @@
 var express = require('express');
 var User = require('../models/User');
+var auth = require('../middlewares/auth');
+
 var router = express.Router();
 
 /* GET users listing. */
-router.get('/', function (req, res, next) {
-  res.json('Hello Welcome to JWT based Authentication Section');
+router.get('/', auth.validateUser, function (req, res, next) {
+  res.json({ user: req.user });
   next();
 });
 
 // register handler
 router.post('/register', async (req, res, next) => {
-
   try {
     var user = await User.create(req.body);
     console.log(user);
     res.status(201).json({ user });
-  }
-   catch(error) {
+  } catch (error) {
     next(error);
   }
 });
@@ -39,14 +39,17 @@ router.post('/login', async (req, res, next) => {
       return res.status(400).json({ error: ' Email not Registered Yet' });
     }
     var result = await user.verifyPassword(password);
+
     console.log(user, result);
 
     // check for password
     if (!result) {
       return res.status(400).json({ error: 'Invalid password' });
     }
+    // login successful
+    var token = await user.createToken();
 
-    return res.status(200).json({ Msg: "Logged IN Successful"})
+    return res.json({ user: user.userJson(token) });
   } catch (error) {
     next(error);
   }
